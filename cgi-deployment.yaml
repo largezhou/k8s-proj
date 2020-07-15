@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: k8s-proj
+  name: cgi-deployment
+  labels:
+    app: cgi
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cgi
+  template:
+    metadata:
+      labels:
+        app: cgi
+    spec:
+      containers:
+      - name: app
+        image: 192.168.1.101:5000/cgi:2
+        ports:
+        - containerPort: 9000
+        env:
+        - name: APP_NAME
+          value: 'TEST LRAVEL K8S'
+        - name: APP_KEY
+          value: 'base64:77lw6aMFXq3qTBibgMKJo7W/cy1ueyDKjJTXoKqwOWk='
+        volumeMounts:
+        - name: src
+          mountPath: /haha
+      volumes:
+      - name: src
+        emptyDir: {}
