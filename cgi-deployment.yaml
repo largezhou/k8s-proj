@@ -21,7 +21,7 @@ spec:
 
       initContainers:
       - name: cgi-code
-        image: 192.168.1.101:5000/cgi-code:5
+        image: 192.168.1.101:5000/cgi-code:6
         command: ['sh', '-c', 'cp -r /code/* /share/ && chmod 777 -R /share/storage']
         volumeMounts:
           - name: code

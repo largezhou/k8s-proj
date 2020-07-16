@@ -83,6 +83,7 @@
                 <div class="title m-b-md">
                     {{ config('app.name') }}
                 </div>
+                <div id="test-js-file" class="title m-b-md">js file not loaded</div>
 
                 <div class="links">
                     <a href="https://laravel.com/docs">Docs</a>
@@ -98,5 +99,5 @@
         </div>
     </body>
 
-    <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="{{ asset('js/onload.js') }}"></script>
 </html>
