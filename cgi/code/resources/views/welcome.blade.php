@@ -97,4 +97,6 @@
             </div>
         </div>
     </body>
+
+    <script src="{{ asset('js/alert.js') }}"></script>
 </html>

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: cgi
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: cgi
@@ -15,19 +15,58 @@ spec:
       labels:
         app: cgi
     spec:
+      volumes:
+      - name: code
+        emptyDir: {}
+
+      initContainers:
+      - name: cgi-code
+        image: 192.168.1.101:5000/cgi-code:5
+        command: ['sh', '-c', 'cp -r /code/* /share/ && chmod 777 -R /share/storage']
+        volumeMounts:
+          - name: code
+            mountPath: /share
+
       containers:
-      - name: app
-        image: 192.168.1.101:5000/cgi:2
+      - name: cgi-fpm
+        image: 192.168.1.101:5000/cgi-fpm:4
         ports:
-        - containerPort: 9000
+        - name: cgi-fpm
+          containerPort: 9000
         env:
         - name: APP_NAME
-          value: 'TEST LRAVEL K8S'
+          value: "TEST LARAVEL K8S"
         - name: APP_KEY
-          value: 'base64:77lw6aMFXq3qTBibgMKJo7W/cy1ueyDKjJTXoKqwOWk='
+          value: "base64:77lw6aMFXq3qTBibgMKJo7W/cy1ueyDKjJTXoKqwOWk="
+        - name: APP_DEBUG
+          value: 'true'
         volumeMounts:
-        - name: src
-          mountPath: /haha
-      volumes:
-      - name: src
-        emptyDir: {}
+          - name: code
+            mountPath: /app
+
+      - name: cgi-nginx
+        image: 192.168.1.101:5000/cgi-nginx:4
+        ports:
+        - name: cgi-nginx
+          containerPort: 80
+        volumeMounts:
+          - name: code
+            mountPath: /app
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: k8s-proj
+  name: cgi-service
+spec:
+  selector:
+    app: cgi
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30000
