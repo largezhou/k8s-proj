@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: k8s-proj
+  name: cgi-ingress
+spec:
+  rules:
+  - host: k8s-proj.l.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: cgi-service
+          servicePort: 80

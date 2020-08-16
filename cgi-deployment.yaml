@@ -14,14 +14,22 @@ spec:
     metadata:
       labels:
         app: cgi
+      annotations:
+        version/config: "2020-08-16 09:34:00"
     spec:
       volumes:
       - name: code
         emptyDir: {}
+      - name: nginx-conf
+        configMap:
+          name: cgi-config
+          items:
+          - key: cgi_nginx_conf
+            path: cgi.conf
 
       initContainers:
       - name: cgi-code
-        image: 192.168.1.101:5000/cgi-code:6
+        image: largezhou/k8s-proj-cgi-code:1
         command: ['sh', '-c', 'cp -r /code/* /share/ && chmod 777 -R /share/storage']
         volumeMounts:
           - name: code
@@ -29,29 +37,40 @@ spec:
 
       containers:
       - name: cgi-fpm
-        image: 192.168.1.101:5000/cgi-fpm:4
+        image: largezhou/k8s-proj-cgi-fpm:1
         ports:
         - name: cgi-fpm
           containerPort: 9000
         env:
         - name: APP_NAME
-          value: "TEST LARAVEL K8S"
+          valueFrom:
+            configMapKeyRef:
+              name: cgi-config
+              key: app_name
         - name: APP_KEY
-          value: "base64:77lw6aMFXq3qTBibgMKJo7W/cy1ueyDKjJTXoKqwOWk="
+          valueFrom:
+            configMapKeyRef:
+              name: cgi-config
+              key: app_key
         - name: APP_DEBUG
-          value: 'true'
+          valueFrom:
+            configMapKeyRef:
+              name: cgi-config
+              key: app_debug
         volumeMounts:
           - name: code
             mountPath: /app
 
       - name: cgi-nginx
-        image: 192.168.1.101:5000/cgi-nginx:4
+        image: nginx:1.19.1-alpine
         ports:
         - name: cgi-nginx
           containerPort: 80
         volumeMounts:
           - name: code
             mountPath: /app
+          - name: nginx-conf
+            mountPath: /etc/nginx/conf.d
 
 ---
 
@@ -68,5 +87,5 @@ spec:
   - name: http
     protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: cgi-nginx
     nodePort: 30000
