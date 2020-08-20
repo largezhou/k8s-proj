@@ -6,9 +6,6 @@
 
         <title>{{ config('app.name') }}</title>
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
-
         <!-- Styles -->
         <style>
             html, body {
@@ -83,7 +80,8 @@
                 <div class="title m-b-md">
                     {{ config('app.name') }}
                 </div>
-                <div id="test-js-file" class="title m-b-md">js file not loaded</div>
+                <h1 id="test-js-file">js file not loaded</h1>
+                <h1>{{ gethostname() }}</h1>
 
                 <div class="links">
                     <a href="https://laravel.com/docs">Docs</a>
